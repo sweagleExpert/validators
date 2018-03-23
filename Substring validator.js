@@ -9,8 +9,9 @@
   "env.db.schema" : "mdm"
 };
  
-// errorsFound is a local variable that counts errors found
-var errorsFound = 0;
+// errorFound is a local variable that founds errors
+var searches = {};
+var errorFound = false;
 /**
  * searchSubsting function searches the whole metadataset to find keys that include a given substring 
  * and checks if their values also include a given substring
@@ -19,6 +20,10 @@ var errorsFound = 0;
  * searchValue must be the string we want check in the values
  */
 function searchSubstring (mds, searchKey, searchValue) {
+
+  if (searches.hasOwnProperty(searchKey) === false) {
+    searches[searchKey] = false;
+  }
   for (var item in mds) {
     // check if the key has a value or points to an object
     if  (typeof (mds[item]) === "object") {
@@ -28,9 +33,11 @@ function searchSubstring (mds, searchKey, searchValue) {
     else{
       // check if the key contains the search term
       if (item.includes(searchKey)) {
+        searches[searchKey] = true;
         // check if the value contains the given subvalue
         if  (!(mds[item].includes(searchValue))){
-          errorsFound = errorsFound + 1;
+          errorFound = true;
+          break;
         }
       }
     }
@@ -48,9 +55,12 @@ for (var obj in keyNamesWithKeyValues) {
  * It returns true when there are no errors (no values found without the given search value)
  * It returns false when at least one error is found 
  */
-if (errorsFound === 0) {
-  return true;  
-}
-else {
+if (errorFound) {
   return false;
 }
+for ( var obj in searches) {
+  if (!(searches[obj])) {
+    return false;
+  }
+}
+return true;

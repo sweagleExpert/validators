@@ -1,5 +1,8 @@
-/** validates that mandatory keys exists and are not empty
- * and no typical development settings are still in use
+/** example validator to ensure that no typical development settings are still in use
+ * 1: validates for a list of keyNames that every MDIkey has a specific value
+ * 2: validates that a set of mandatory keys exists and are not empty
+ * 3: validates that no MDI key can have one of the values in the list of unwantedValues
+ * 4: validates that a list of keyNames can only appear once 
  */
  
 var keyNamesWithKeyValues = {

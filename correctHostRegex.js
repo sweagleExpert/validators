@@ -2,7 +2,7 @@
 
 // correctHostRegex.js
 //
-// No inputs except CDS to parse
+// No inputs except subset to parse
 //
 // Creator:   Dimitris for customer POC
 // Version:   1.0
@@ -19,7 +19,7 @@ var errors_description = '';
 var urlExpression = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
 var validUrlRegex = new RegExp(urlExpression);
 var authorisedHostRegex = new RegExp(".priv$");
-var subset = {};
+
 findValuesMatchingUrl(metadataset, validUrlRegex);
 
 if (errorFound) {
@@ -31,20 +31,20 @@ return {description: description, result:!errorFound};
 
 
 // Function to match URL in values and extract host from it
-function findValuesMatchingUrl(cds, regex) {
-  for (var item in cds) {
+function findValuesMatchingUrl(subset, regex) {
+  for (var item in subset) {
     if (maxErrorDisplay !==0 && errors.length >= maxErrorDisplay) { break; }
-    if  (typeof(cds[item]) === "object") {
+    if  (typeof(subset[item]) === "object") {
       // If we are on a node call recursively the function
-      findValuesMatchingUrl (cds[item], regex);
-    } else if (regex.test(cds[item]) ) {
+      findValuesMatchingUrl (subset[item], regex);
+    } else if (regex.test(subset[item]) ) {
       // check if not in exception list
       var exception = false;
       for(var exc=0; exc < exceptionList.length; exc++) {
         if (item.toLowerCase() === exceptionList[exc].toLowerCase()) { exception=true; break; }
       }
       if (exception === false) {
-        var host=getHost(cds[item]);
+        var host=getHost(subset[item]);
         if (! authorisedHostRegex.test(host)) {
           errorFound = true;
           errors.push("## ERROR: URL key "+item+" has invalid host ("+host+")");

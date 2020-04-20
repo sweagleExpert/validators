@@ -1,13 +1,14 @@
 var cds = [];
+
 var res = true;
 var errorMsg = '';
+var rootNode = Object.keys(cds[0])[0];
 
-for (var component in cds[0].DEM2.currentDiscovered) {
-  console.log(component);
-  for (var cdi in cds[0].DEM2.currentDiscovered[component]) {
+for (var component in cds[0][rootNode].currentDiscovered) {
+  for (var cdi in cds[0][rootNode].currentDiscovered[component]) {
     if (cdi.endsWith("BuildNbr")) {
-      if (cds[0].DEM2.currentDiscovered[component][cdi] !== cds[0].DEM2.currentDeployed[component][cdi]){
-        errorMsg += cdi+", ";
+      if (cds[0][rootNode].currentDiscovered[component][cdi] !== cds[0][rootNode].currentDeployed[component][cdi]){
+        errorMsg += component+" - deployed: " + cds[0][rootNode].currentDeployed[component][cdi] +" discovered: " +  cds[0][rootNode].currentDiscovered[component][cdi] +"\n";
         res= false;
       }
     }
@@ -16,5 +17,5 @@ for (var component in cds[0].DEM2.currentDiscovered) {
 if (res === true) {
   	return { 'result': true, 'description': 'All values are identical' };
 } else {
-  	return { 'result': false, 'description': 'Difference in:'+ errorMsg.substring(0, errorMsg.length - 1)};
+  	return { 'result': false, 'description': 'Difference in:\n'+ errorMsg.substring(0, errorMsg.length - 1)};
 }

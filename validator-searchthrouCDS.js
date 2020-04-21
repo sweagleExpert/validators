@@ -42,9 +42,9 @@ for (var index in arrays) {
 
 
 if (res === true) {
-  console.log("all good", res);
-  // return { 'result': true, 'description': 'All values are unique' };
+  // console.log("all good", res);
+  return { 'result': true, 'description': 'All values are unique' };
 } else {
-  console.log("Duplicates", result);
-  // return { 'result': false, 'description': 'Contain duplicate values' };
+  // console.log("Duplicates", result);
+  return { 'result': false, 'description': 'Contain duplicate values' };
 }

@@ -25,9 +25,9 @@ for (var attr in metadatasets[1].forbiddenKVpairs) {
 }
 
 if (res === true) {
-  console.log("forbidden KV pairs do not exist");
-  //   return { 'result': true, 'description': 'Forbidden KV pairs do not exist' };
+  // console.log("forbidden KV pairs do not exist");
+    return { 'result': true, 'description': 'Forbidden KV pairs do not exist' };
 } else {
-  console.log("Contains forbidden KV pairs", list);
-  //   return { 'result': false, 'description': 'Contains forbidden KV pairs' };
+  // console.log("Contains forbidden KV pairs", list);
+    return { 'result': false, 'description': 'Contains forbidden KV pairs' };
 }

@@ -54,9 +54,9 @@ for (var prop in metadatasets[1].consistencyCheck) {
 }
 res = AllEqual(finalCheck);
 if (res === true) {
-  console.log('All values are identical');
-  // return { 'result': true, 'description': 'All values are identical' };
+  // console.log('All values are identical');
+  return { 'result': true, 'description': 'All values are identical' };
 } else {
-  console.log('No identical values:'+ JSON.stringify(finalCheck));
-  // return { 'result': false, 'description': 'No identical values'+ result.toString()};
+  // console.log('No identical values:'+ JSON.stringify(finalCheck));
+  return { 'result': false, 'description': 'No identical values'+ result.toString()};
 }

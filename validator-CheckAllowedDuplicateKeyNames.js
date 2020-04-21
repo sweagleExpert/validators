@@ -51,10 +51,10 @@ for (var entry in arrays) {
   }
 }
 if (res === true) {
-  console.log('All values exist exactly one time');
-  // return { 'result': true, 'description': 'All values exist exactly one time' };
+  // console.log('All values exist exactly one time');
+  return { 'result': true, 'description': 'All values exist exactly one time' };
 } else {
-  console.log(msg);//todo needs rework for browser output
-  // return { 'result': false, 'description': msg};
+  // console.log(msg);//todo needs rework for browser output
+  return { 'result': false, 'description': msg};
 }
 

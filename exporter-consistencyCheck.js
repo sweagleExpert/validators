@@ -64,5 +64,3 @@ for (var entry in finalCheck) {
     }
 }
 
-console.log(finalCheck);
-

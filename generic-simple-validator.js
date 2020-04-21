@@ -29,8 +29,8 @@ for (var ruleKey in rulesNode) {
   var index = rulesNode[ruleKey].indexOf(operatorSeparator);
   var operator = rulesNode[ruleKey].substring(0, index);
   var value = rulesNode[ruleKey].substring(index+1);
-  console.log("operator="+operator);
-  console.log("value="+value);
+  //console.log("operator="+operator);
+  //console.log("value="+value);
   if (operatorArray.includes(operator)) {
     checkKeyValue(subsetToCheck, ruleKey, operator, value, ["outputs"], 1, "/");
   } else {
@@ -72,9 +72,9 @@ function checkKeyValue(mds, keyName, operator, refValue, prefix, level, pathSepa
 }
 
 function checkValue (val, op, refVal) {
-  console.log("op"+op);
-  console.log("val"+val);
-  console.log("refVal"+refVal);
+  //console.log("op"+op);
+  //console.log("val"+val);
+  //console.log("refVal"+refVal);
 
   switch (op) {
     case ">" :
@@ -88,7 +88,7 @@ function checkValue (val, op, refVal) {
       break;
     case "IN" :
       valArray = refVal.split(',');
-      console.log(valArray);
+      // console.log(valArray);
       if (!(valArray.includes(val))) { return false; }
       break;
     case "NOT IN" :

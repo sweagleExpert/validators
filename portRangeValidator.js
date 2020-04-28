@@ -7,6 +7,11 @@
   "^env.db.port$" : "10000-65535"
 };
 
+// Defines if error must include full path of key found
+var includePath = true;
+var pathSeparator = '/';
+// Defines the max number of errors to return
+var maxErrorDisplay = 3;
 var errorFound = false;
 var errors = [];
 var description = '';
@@ -19,10 +24,14 @@ for (var obj in keysWithRange) {
   var max = Number(range.substring(range.indexOf("-")+1));
   //console.log("min="+min);
   //console.log("max="+max);
-  searchport(metadataset, regex, min, max);
+  searchport(metadataset, regex, min, max, '');
 }
 
-description = errors.join(', ');
+if (errorFound) {
+  if (errors.length < maxErrorDisplay) { description = "ERRORS: " + errors.join(' '); }
+  else { description = "ERRORS: only first "+maxErrorDisplay+" errors are displayed:" + errors.join(' '); }
+} else { description = "Validation passed successfully"; }
+
 return {description: description, result:!errorFound};
 
 
@@ -31,12 +40,14 @@ return {description: description, result:!errorFound};
  * searchport function searches the whole metadataset to find the given searchkey and compare it with the given range
  * mds must be the given metadataset, searchKey must be the key we want to check, rangeMin and rangeMax must be the numeric limit
  */
-function searchport (mds, searchKey, rangeMin, rangeMax) {
+function searchport (mds, searchKey, rangeMin, rangeMax, path) {
   for (var item in mds) {
+    // get out if we already reach max nb of errors to display
+    if (errors.length >= maxErrorDisplay) { break; }
     // check if the key has a value or points to an object
     if  (typeof (mds[item]) === "object") {
       // if value is an object call recursively the function to search this subset of the object
-      searchport (mds[item], searchKey, rangeMin, rangeMax);
+      searchport (mds[item], searchKey, rangeMin, rangeMax, path+item+pathSeparator);
     } else {
       // check if the key equals to the search term
       if (searchKey.test(item)) {
@@ -45,7 +56,8 @@ function searchport (mds, searchKey, rangeMin, rangeMax) {
         // check if the value is not above the given threshold
         if  (!(mds[item].length > 0 && Number(mds[item]) >= rangeMin && Number(mds[item]) <= rangeMax)) {
           errorFound = true;
-          errors.push("*** Port ("+item+") has value ("+mds[item]+") not in approved range "+rangeMin+"-"+rangeMax);
+          if (includePath) { errors.push("*** Port ("+path+item+") has value ("+mds[item]+") not in approved range "+rangeMin+"-"+rangeMax); }
+          else { errors.push("*** Port ("+item+") has value ("+mds[item]+") not in approved range "+rangeMin+"-"+rangeMax); }
         }
       }
     }

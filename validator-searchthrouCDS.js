@@ -1,4 +1,4 @@
-//This validator checks for duplicates across multiple CDS.
+// description: This validator checks for duplicates across multiple CDS.
 var res = true;
 var arguments = JSON.parse(arg);
 var arrays = {};

@@ -1,3 +1,4 @@
+// description: Check if all keys exist exactly one time, except from the values defined in the secondary CDS.
 var arrays = {};
 var res = true;
 var msg = "";

@@ -1,4 +1,4 @@
-//This validator searches the primary CDS for forbidden key-value pairs (contained in the secondary CDS)
+// description: This validator searches the primary CDS for forbidden key-value pairs (contained in the secondary CDS)
 var res = true;
 var list = [];
 

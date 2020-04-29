@@ -1,4 +1,4 @@
-
+// description: Check if all keys defined in the secondary CDS are unique in the primary one.
 var arrays = {};
 var res = true;
 var msg = "";

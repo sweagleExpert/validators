@@ -1,3 +1,4 @@
+// description: Check if all same cdis of different nodes have the same value
 var cds = [];
 
 var res = true;

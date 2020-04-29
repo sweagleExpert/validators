@@ -1,3 +1,4 @@
+// description: Check if all keys defined in the secondary cds habe a consistent value in the primary one
 var res = true;
 var errorMsg = '';
 var arrays = {};

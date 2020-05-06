@@ -14,9 +14,9 @@ var rootNode=Object.keys(cds[0]);
 // Defines the host to check
 var host = "";
 // Errors variables
+var description = 'SUCCESS: Host can resolve to an ip address in selected dns';
 var errorFound = false;
 var errors = [];
-var errors_description = '';
 
 // HANDLERS
 // Inputs parser and checker
@@ -42,23 +42,23 @@ if (host!=null && !errorFound) {
     // We are checking the full dns, check for each zone
     // We initiate error at true and check if any zone contains A-record, then we set it to false and break
     errorFound = true;
-    errors.push("## Host ("+host+") cannot be resolved to an A-Record in all DNS");
     for (var zone in cds[0][rootNode]) {
   	  // console.log("zone="+zone);
       if (hasARecord(host, [], cds[0][rootNode][zone])) { errorFound = false; break; }
     }
+	if (errorFound) { errors.push("ERROR: Host ("+host+") cannot be resolved to an A-Record in all DNS"); }
   } else {
     // We are checking a single dns zone
     if (! hasARecord(host, [], cds[0][rootNode])) {
       errorFound = true;
-      errors.push("## Host ("+host+") cannot be resolved to an A-Record in selected DNS("+rootNode+")");
+      errors.push("ERROR: Host ("+host+") cannot be resolved to an A-Record in selected DNS ("+rootNode+")");
     }
   }
 }
 
 // Return the list of all errors trapped
-errors_description = errors.join(', ');
-return {description: errors_description, result:!errorFound};
+if (errorFound) { description = errors.join(', '); }
+return {description: description, result:!errorFound};
 
 
 // FUNCTIONS LIST

@@ -40,8 +40,6 @@ var pathSeparator = "/";
       superCDS[rootNode] = cds[i][rootNode];
     }
     keyNamesWithPasswordValues=objFormat(arg.trim());
-    console.log("keyNamesWithPasswordValues: "+keyNamesWithPasswordValues);
-    console.log("exceptionList: "+exceptionList);
   } else {
     errorFound=true;
     errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");

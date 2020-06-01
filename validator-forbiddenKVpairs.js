@@ -1,7 +1,59 @@
 // description: This validator searches the primary CDS for forbidden key-value pairs (contained in the secondary CDS)
+// validator-forbiddenKVpairs.js
+//
+// Inputs are: the list of key-value pairs forbidden
+//    Input type: an object arg containing a list of strings arrays
+//
+// Creator: 
+// Maintainer: Cyrille
+// Version:   1.0
+// Support: Sweagle version >= 3.11
+
+// VARIABLES DEFINITION
+// Store all the config datasets
+var superCDS = {};
+// Root node string used to concatenate all CDS in superCDS
+var rootNode = "";
 var res = true;
 var list = [];
+// Defines the variables for error
+var errorFound = false;
+var errors = [];
+var description = '';
 
+// HANDLERS
+// Inputs parser and checker
+  // Input values in object notation
+  // Checking the assigned metadasets and parse the node name from input values in object notation
+  if (arg!=null && cds!=null){
+    for (var i=0; i<cds.length; i++){
+      rootNode = Object.keys(cds[i])[0];
+      superCDS[rootNode] = cds[i][rootNode];
+    }
+  } else {
+    errorFound=true;
+    errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");
+  }
+
+// MAIN
+for (var attr in superCDS.forbiddenKVpairs) {
+  if (hasOwnDeepPropertyWithVal(rootNode, attr, superCDS.forbiddenKVpairs[attr])) {
+    res = false;
+    list.push(attr + superCDS.forbiddenKVpairs[attr]);
+
+  }
+}
+
+// Return the list of all errors trapped
+if (errorFound) {
+  if (errors.length < maxErrorDisplay) { description = "ERRORS: " + errors.join(' '); }
+  else { description = "Contains forbidden KV pairs"; }
+} else { description = "Forbidden KV pairs do not exist"; }
+
+return {description: description, result:!errorFound};
+
+ // FONCTIONS LIST
+// here we call our function with different search terms
 function hasOwnDeepPropertyWithVal(obj, forbiddenKey, forbiddenValue) {
   if (typeof (obj) === 'object' && obj !== null) {
     if (obj.hasOwnProperty(forbiddenKey) && obj[forbiddenKey] === forbiddenValue) {
@@ -14,20 +66,4 @@ function hasOwnDeepPropertyWithVal(obj, forbiddenKey, forbiddenValue) {
     }
   }
   return false;
-}
-
-for (var attr in metadatasets[1].forbiddenKVpairs) {
-  if (hasOwnDeepPropertyWithVal(metadatasets[0], attr, metadatasets[1].forbiddenKVpairs[attr])) {
-    res = false;
-    list.push(attr + metadatasets[1].forbiddenKVpairs[attr]);
-
-  }
-}
-
-if (res === true) {
-  // console.log("forbidden KV pairs do not exist");
-    return { 'result': true, 'description': 'Forbidden KV pairs do not exist' };
-} else {
-  // console.log("Contains forbidden KV pairs", list);
-    return { 'result': false, 'description': 'Contains forbidden KV pairs' };
 }

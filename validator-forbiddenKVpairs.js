@@ -1,8 +1,6 @@
 // description: This validator searches the primary CDS for forbidden key-value pairs (contained in the secondary CDS)
 // validator-forbiddenKVpairs.js
 //
-// Inputs are: the list of key-value pairs forbidden
-//    Input type: an object arg containing a list of strings arrays
 //
 // Creator: 
 // Maintainer: Cyrille

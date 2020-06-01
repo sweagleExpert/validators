@@ -7,7 +7,6 @@
 // Creator:   Dimitris Finas for customer POC
 // Maintainer: Cyrille
 // Support: Sweagle version >= 3.11
-//
 
 // VARIABLES DEFINITION
 // Store all the config datasets

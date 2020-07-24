@@ -5,7 +5,7 @@
  * var keysWithPathAndWantedValues is an object that holds
  * - key : path that we want to search
  * - array of wanted values with operator as first item of array
- * - operator could be = < >, if * is before operator, it means all keys in node found must be verified
+ * - operator could be = != < >, if * is before operator, it means all keys in node found must be verified
  */
 var pathAndWantedValues = {
   "openshift/environment/p/resources/autoscaling/replicas" : ["*>", "1"],
@@ -46,6 +46,25 @@ for (var obj in pathAndWantedValues) {
           if (value < pathAndWantedValues[obj][i]) { badValue[obj] = false; break; }
         }
         if (badValue[obj]) { errorFound=true; errors.push("## key "+obj+" doesn't have expected value"); }
+        break;
+      case "!=" :
+	      badValue[obj] = false;
+        for (var i=1; i < pathAndWantedValues[obj].length; i++) {
+          //console.log("compare with="+pathAndWantedValues[obj][i]);
+          if (value === pathAndWantedValues[obj][i]) { badValue[obj] = true; break; }
+        }
+        if (badValue[obj]) { errorFound=true; errors.push("## key "+obj+" is having a forbidden value ("+pathAndWantedValues[obj][i]+")"); }
+        break;
+      case "*!=" :
+        for (var item in value) {
+          if (errors.length >= maxErrorDisplay) { break; }
+          badValue[obj] = false;
+          for (var i=1; i < pathAndWantedValues[obj].length; i++) {
+            console.log("compare with="+pathAndWantedValues[obj][i]);
+            if (value === pathAndWantedValues[obj][i]) { badValue[obj] = true; break; }
+          }
+          if (badValue[obj]) { errorFound=true; errors.push("## key "+obj+" is having a forbidden value ("+pathAndWantedValues[obj][i]+")"); }
+        }
         break;
       case "*=" :
           for (var item in value) {

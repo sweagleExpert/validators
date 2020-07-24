@@ -1,10 +1,23 @@
-// description: Check if there is no duplicate key value between conf and deployed instances
-
-// duplicateIP.js
-// Creator:   Dimitris Finas for customer POC
-// Version:   1.O - First release
+// description: Check if there is no duplicate key value with a data set
+// duplicateKeyValue.js
 //
+// Inputs are: the keys list to search for duplicates
+//    Input type: an object arg containing a string
+// Outputs are: the list of keys which are duplicated
+//    Output type: config datasets failing the validation
+//
+// Creator: Cyrille
+// Maintainer:
+// Version:   0.9
+// Support: Sweagle version >= 3.11
 
+// VARIABLES DEFINITION
+// Store all the config datasets
+var superCDS = {};
+// Root node string used to concatenate all CDS in superCDS
+var rootNode = "";
+// Define keywords in key name that defines a password
+var keyNames = [];
 // Defines if error must include full path of key found
 var includePath = true;
 // Defines the max number of errors to return
@@ -12,30 +25,31 @@ var maxErrorDisplay = 3;
 var errorFound = false;
 var errors = [];
 var description = '';
+// Define the path 
 var pathSeparator = "/";
 
-var rootName = Object.keys(metadataset)[0];
-var root = metadataset[rootName];
-// Outputs to check for value
-var subsetOutputs= root.Outputs;
-// Instances that may contains duplicates
-var subsetInstances= root.Instances;
-// Node where is defined keys to search for duplicates
-var rulesNode = root.ReglesValidation.DuplicateKeyValue;
+// HANDLERS
+// Inputs parser and checker
+// Input values in object notation
+// Checking the assigned metadasets and parse the node name from input values in object notation
+if (arg!=null && cds!=null){
+  for (var i=0; i<cds.length; i++){
+    rootNode = Object.keys(cds[i])[0];
+    superCDS[rootNode] = cds[i][rootNode];
+  }
+  keyNames=objFormat(arg.trim());
+} else {
+  errorFound=true;
+  errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");
+}
 
-if (subsetOutputs == undefined) { return {description: "ERROR: Subset Outputs not found", result: false}; }
-if (subsetInstances == undefined) { return {description: "ERROR: Subset Instances not found", result: false}; }
-if (rulesNode == undefined) { return {description: "*** ERROR: Rules list not found ", result: false}; }
-
-// Define keynames array to search for
-var keyNames = Object.keys(rulesNode);
-
+//MAIN
 // here we call our function with different search terms
 for (var i= 0; i < keyNames.length; i++) {
-  if (keyNames[i] !== "_description") {
-    var myValue = getKeyValueByName(subsetOuputs, keyNames[i]);
+  if (keyNames[i] !== "") {
+    var myValue = getKeyValueByName(superCDS, keyNames[i]);
     // If found, check if these value exists for same key in all instances
-    if (myValue != "ERROR: NOT FOUND") { checkKeyValueExists(subsetInstances, keyNames[i], myValue, ''); }
+    if (myValue != "ERROR: NOT FOUND") { checkKeyValueExists(superCDS, keyNames[i], myValue, ''); }
   }
 }
 
@@ -47,6 +61,49 @@ if (errors.length > 0) {
 
 return {description: description, result:!errorFound};
 
+// FONCTIONS LIST
+// Parse the object notation: check upon against the RegEx format
+function objFormat(obj) {
+  var matches = ""; 
+  var index = "";
+  var keysList = [];
+  // {"keyNames" : ["key1","key2","key3"]}
+  var jsonRegex = /^\{/gm;
+  // <keyNames>
+  //		<keyName>key1</keyName>
+  //		<keyName>key2</keyName>
+  //		<keyName>key3</keyName>
+  // </keyNames>
+  var xmlRegex = /\<.*\>(.*?)<\/.*\>/gm;
+  // keyNames:
+  //	-key1 
+  //	-key2 
+  //	-key3
+  var yamlRegex = /.*\-(.*?)$/gm;
+  // JSON
+  if (jsonRegex.test(obj)) {
+    matches = JSON.parse(obj);
+    keysList = matches.keyNames;
+    return keysList;
+  }
+  // XML
+  else if (xmlRegex.test(obj)) {
+    matches = Array.from(obj.matchAll(xmlRegex));
+    for (index in matches) {keysList.push(matches[index][1]);}
+    return keysList;
+  }
+  // YAML
+  else if (yamlRegex.test(obj)) {
+    matches = Array.from(obj.matchAll(yamlRegex));
+    for (index in matches) {keysList.push(matches[index][1]);}
+    return keysList;
+   }
+// Unexpected Inputs
+  else {
+    errorFound=true;
+    errors.push("ERROR: Inputs unexpected!, the arg object must contains an array of strings");
+  }
+}
 
 function getKeyValueByName(mds, keyName) {
   var value = "ERROR: NOT FOUND";
@@ -64,17 +121,16 @@ function getKeyValueByName(mds, keyName) {
   return value;
 }
 
-
 function checkKeyValueExists (mds, keyname, keyvalue, path) {
   for (var item in mds) {
     if (errors.length >= maxErrorDisplay) { break; }
     // check if the key has a value or points to an object
     if  (typeof (mds[item]) === "object") {
       // if value is an object call recursively the function to search this subset of the object
-      checkKeyValueExists(mds[item], keyName, keyvalue, path+item+pathSeparator);
+      checkKeyValueExists(mds[item], keyname, keyvalue, path+item+pathSeparator);
     } else {
       // check if the key & value equals to the search term
-      if (item === keyName && mds[item] === keyvalue) { errors.push("Key: "+path+item+" contains same value: "+keyvalue); }
+      if (item === keyname && mds[item] === keyvalue) { errors.push("Key: "+path+item+" contains same value: "+keyvalue); }
     }
   }
 }

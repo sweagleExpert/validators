@@ -24,13 +24,13 @@ import json
 # FUNCTIONS LIST
 # Parse the object notation: check upon against the RegEx format
 def objFormat(obj):
-  keysList = ""
-  # {"KeyNames" : ["key1","key2","key3"]}
+  keysList = list()
+  # {"KeysList" : ["key1","key2","key3"]}
   # JSON format
-  # <KeyNames>Value</KeyNames>
+  # <KeysList>Value</KeysList>
   # XML format
   # ---
-  # KeyNames: Value
+  # KeysList: Value
   # YAML format
   if obj[0]=='{':
     # JSON
@@ -48,37 +48,33 @@ def objFormat(obj):
     #valueToCheck=yamlObj["KeysList"]
     return keysList
   else:
-    global errorFound, errors
-    errorFound = True
+    global errors
     errors.append("ERROR: Inputs unexpected!, please provide an object notation (arg). Inputs variables list (args[]) is deprecated.")
 
-# Function to retrieve the key value of searched key
-def getKeyValueByName(dataset, keyName):
+# Function to find keys with duplicate values in CDS
+def getDuplicateKeyValue(dataset, keyName):
+  global errors
   value = "ERROR: NOT FOUND"
-  # If the current key equals the key name
-  # Returns the key value for the current key name
-  if keyName in dataset:
-    return dataset[keyName]
-  # Recursive search in the node
-  for k, v in dataset.items():
-      if isinstance(v,dict):
-          value = getKeyValueByName(v, keyName)
-          if value is not None:
-            return value
-
-# Function to check if the key & value equals tp search term
-def checkKeyValueExists(dataset, keyname, keyvalue, path):
+  flipped = {}
   # If the number of errors found is reached
-  global errorFound, errors
   if len(errors) <= maxErrorDisplay:
-    if keyname in dataset:
-      keyvalue = dataset[keyname]
-      errorFound = True
-      errors.append("Key: "+path+keyname+" contains same value: "+keyvalue)
-    # Recursive search in the node
+    if keyName in dataset:
+      # Once the key name found into the CDS, search all its values by flipping the dictionary
+      for k, v in dataset.items():
+        if v not in flipped:
+          flipped[v] = [k]
+        else:
+          # Duplicated K/V found and return it
+          flipped[v].append(k)
+          errors.append("Key: "+keyName+" contains same value: "+str(flipped))  
+    # Search into the CDS the key name
     for k, v in dataset.items():
-        if isinstance(v,dict):
-            return checkKeyValueExists(v, keyname, keyvalue, path)
+      # Recursive search in the CDS   
+      if isinstance(v,dict):
+        item = getDuplicateKeyValue(v, keyName)
+        if item is not None: return item
+      else:
+        return value
 
 # HANDLERS
 # Inputs parser and checker
@@ -119,21 +115,21 @@ keyNames=handlers(arg)
 # MAIN ROUTINE
 # here we call our function with different search terms
 if keyNames is not None and errorFound is not True:
+  global errors
   for i in range(0, len(cds)):
     superCDS = cds[i]
   # For each key name in the list
   for k in range(0, len(keyNames)):
-    myValue=getKeyValueByName(superCDS, keyNames[k])
-    if myValue is not "ERROR: NOT FOUND":
-        checkKeyValueExists(superCDS, keyNames[k], myValue, '')
+    myValue=getDuplicateKeyValue(superCDS, keyNames[k])
+    if myValue is "ERROR: NOT FOUND":
+        errors.append(myValue)
   # Return the validation status
-  global errors
   if len(errors) > 0:
     errorFound = True
     if len(errors) < maxErrorDisplay:
       errors_description = "ERRORS: " +', '.join(errors)
     else:
       errors_description = "ERRORS: only first "+maxErrorDisplay+" errors are displayed:" +', '.join(errors)
-  else:
-    errors_description = "Validation passed successfully"
-return {"description":errors_description, "result":errorFound}
+else:
+   errors_description = "Validation passed successfully"
+return {"description":errors_description, "result":not errorFound}

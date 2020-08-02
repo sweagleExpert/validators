@@ -33,7 +33,7 @@ var pathSeparator = "/";
 // HANDLERS
 // Inputs parser and checker
   // Input values in object notation
-  // Checking the assigned metadasets and parse the node name from input values in object notation
+  // Checking the assigned cds and parse the node name from input values in object notation
   if (arg!=null && cds!=null){
     for (var i=0; i<cds.length; i++){
       rootNode = Object.keys(cds[i])[0];
@@ -48,7 +48,7 @@ var pathSeparator = "/";
 // MAIN
 // here we call our function with different search terms
 for (var i= 0; i < keyNamesWithPasswordValues.length; i++) {
-  searchSubstring(metadataset, keyNamesWithPasswordValues[i].toLowerCase(), [], 0, pathSeparator);
+  searchSubstring(superCDS, keyNamesWithPasswordValues[i].toLowerCase(), [], 0, pathSeparator);
 }
 
 // Return the list of all errors trapped
@@ -108,7 +108,7 @@ function objFormat(obj) {
 }
 
 /**
- * searchSubsting function searches the whole metadataset to find keys that include a given substring
+ * searchSubsting function searches the whole cds to find keys that include a given substring
  * and checks if their values is protected as sensitive data
  *
  * cds must be the given config dataset,

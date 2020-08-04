@@ -34,7 +34,7 @@ var pathSeparator = "/";
 // Inputs parser and checker
   // Input values in object notation
   // Checking the assigned cds and parse the node name from input values in object notation
-  // Else set the default values for running the passwordChecker
+  
 if (cds!=null){
   for (var i=0; i<cds.length; i++){
     rootNode = Object.keys(cds[i])[0];
@@ -44,7 +44,7 @@ if (cds!=null){
   errorFound=true;
   errors.push("ERROR: No CDS provided!");
 } 
-
+// Else set the default values for running the passwordChecker
 if (arg!=""){
   keyNamesWithPasswordValues=objFormat(arg.trim());
 } else {

@@ -33,22 +33,30 @@ var pathSeparator = "/";
 // HANDLERS
 // Inputs parser and checker
   // Input values in object notation
-  // Checking the assigned metadasets and parse the node name from input values in object notation
-  if (arg!=null && cds!=null){
-    for (var i=0; i<cds.length; i++){
-      rootNode = Object.keys(cds[i])[0];
-      superCDS[rootNode] = cds[i][rootNode];
-    }
-    keyNamesWithPasswordValues=objFormat(arg.trim());
-  } else {
-    errorFound=true;
-    errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");
+  // Checking the assigned cds and parse the node name from input values in object notation
+  // Else set the default values for running the passwordChecker
+if (cds!=null){
+  for (var i=0; i<cds.length; i++){
+    rootNode = Object.keys(cds[i])[0];
+    superCDS[rootNode] = cds[i][rootNode];
   }
+} else {
+  errorFound=true;
+  errors.push("ERROR: No CDS provided!");
+} 
+
+if (arg!=""){
+  keyNamesWithPasswordValues=objFormat(arg.trim());
+} else {
+  //Setting default values
+  keyNamesWithPasswordValues=["pass","pwd","secret"];
+  exceptionList=[""];
+}
 
 // MAIN
 // here we call our function with different search terms
 for (var i= 0; i < keyNamesWithPasswordValues.length; i++) {
-  searchSubstring(metadataset, keyNamesWithPasswordValues[i].toLowerCase(), [], 0, pathSeparator);
+  searchSubstring(superCDS, keyNamesWithPasswordValues[i].toLowerCase(), [], 0, pathSeparator);
 }
 
 // Return the list of all errors trapped

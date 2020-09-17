@@ -7,6 +7,7 @@
 // Creator:   Dimitris Finas for customer POC
 // Maintainer: Cyrille
 // Support: Sweagle version >= 3.11
+//
 
 // VARIABLES DEFINITION
 // Store all the config datasets
@@ -25,6 +26,27 @@ var errorFound = false;
 var errors = [];
 var description = '';
 
+// HANDLERS
+// Inputs parser and checker
+  // Input values in object notation
+  // Checking the assigned metadasets and parse the node name from input values in object notation
+  // Else set the default values for running the validator
+  if (cds!=null){
+    for (var i=0; i<cds.length; i++){
+      rootNode = Object.keys(cds[i])[0];
+      superCDS[rootNode] = cds[i][rootNode];
+    }
+  } else {
+    errorFound=true;
+    errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");
+  }
+	
+  if (arg!=""){
+    exceptionList=objFormat(arg.trim());
+  } else {
+    //Setting default values
+    exceptionList=[""];
+  }
 // MAIN
 searchSubstringWithPath(superCDS, searchValue.toLowerCase(), [], 0, "/");
 
@@ -37,6 +59,46 @@ if (errorFound) {
 return {description: description, result:!errorFound};
 
  // FONCTIONS LIST
+// Parse the object notation: check upon against the RegEx format
+function objFormat(obj) {
+  var matches = ""; 
+  var index = "";
+  //  {
+  //    "exceptionList" : ["KEYNAME"]
+  //  }
+  var jsonRegex = /^\{/gm;
+  // <exceptionList>
+  //		<exception>KEYNAME</exception>
+  // </exceptionList>
+  var xmlRegex = /\<.*\>(.*?)<\/.*\>/gm;
+  // exceptionList:
+  //	-KEYNAME 
+  var yamlRegex = /.*\-(.*?)$/gm;
+  // JSON
+  if (jsonRegex.test(obj)) {
+    matches = JSON.parse(obj);
+    exceptionList = matches.exceptionList;
+    return exceptionList;
+  }
+  // XML
+  else if (xmlRegex.test(obj)) {
+    matches = Array.from(obj.matchAll(xmlRegex));
+    for (index in matches) {exceptionList.push(matches[index][1]);}
+    return exceptionList;
+  }
+  // YAML
+  else if (yamlRegex.test(obj)) {
+    matches = Array.from(obj.matchAll(yamlRegex));
+    for (index in matches) {exceptionList.push(matches[index][1]);}
+    return exceptionList;
+   }
+// Unexpected Inputs
+  else {
+    errorFound=true;
+    errors.push("ERROR: Inputs unexpected!, the arg object must contains an array of strings");
+  }
+}
+
 /**
  * searchSubsting function searches the whole config dataset to find keys that include a given substring
  *

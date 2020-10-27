@@ -1,8 +1,7 @@
 // description: Check if sensitive values are encrypted or replaced by tokens
 // passwordChecker.js
 //
-// Inputs are: the key names list containing senstive values
-//    Input type: an object arg containing a list of strings arrays
+// Inputs are: no inputs
 //
 // Creator: Dimtris
 // Maintainer: Cyrille
@@ -15,7 +14,7 @@ var superCDS = {};
 // Root node string used to concatenate all CDS in superCDS
 var rootNode = "";
 // Define keywords in key name that defines a password
-var keyNamesWithPasswordValues = [];
+var keyNamesWithPasswordValues=["pass","pwd","secret"];
 // Define key names to exclude from the research
 var exceptionList = [];
 // Defines if error must include full path of key found
@@ -27,30 +26,17 @@ var errors = [];
 var description = '';
 // Define the token syntax for key value
 var tokenPrefix = "@@";
-// Define the path 
+// Define the path
 var pathSeparator = "/";
 
 // HANDLERS
 // Inputs parser and checker
   // Input values in object notation
   // Checking the assigned cds and parse the node name from input values in object notation
-  
-if (cds!=null){
-  for (var i=0; i<cds.length; i++){
-    rootNode = Object.keys(cds[i])[0];
-    superCDS[rootNode] = cds[i][rootNode];
-  }
-} else {
-  errorFound=true;
-  errors.push("ERROR: No CDS provided!");
-} 
-// Else set the default values for running the passwordChecker
-if (arg!=""){
-  keyNamesWithPasswordValues=objFormat(arg.trim());
-} else {
-  //Setting default values
-  keyNamesWithPasswordValues=["pass","pwd","secret"];
-  exceptionList=[""];
+
+for (var i=0; i<cds.length; i++){
+  rootNode = Object.keys(cds[i])[0];
+  superCDS[rootNode] = cds[i][rootNode];
 }
 
 // MAIN
@@ -67,53 +53,6 @@ if (errorFound) {
 
 return {description: description, result:!errorFound};
 
- // FONCTIONS LIST
-// Parse the object notation: check upon against the RegEx format
-function objFormat(obj) {
-  var matches = ""; 
-  var index = "";
-  // "password", This is already handled by "pass" below
-  //  {
-  //    "keyNames" : ["pass","pwd","secret"],
-  //    "exceptionList" : ["KEYNAME"]
-  //  }
-  var jsonRegex = /^\{/gm;
-  // <keyNames>
-  //		<keyName>pass</keyName>
-  //		<keyName>pwd</keyName>
-  //		<keyName>secret</keyName>
-  // </keyNames>
-  var xmlRegex = /\<.*\>(.*?)<\/.*\>/gm;
-  // keyNames:
-  //	-pass 
-  //	-pwd 
-  //	-secret
-  var yamlRegex = /.*\-(.*?)$/gm;
-  // JSON
-  if (jsonRegex.test(obj)) {
-    matches = JSON.parse(obj);
-    keyNamesWithPasswordValues = matches.keyNames;
-    exceptionList = matches.exceptionList;
-    return keyNamesWithPasswordValues;
-  }
-  // XML
-  else if (xmlRegex.test(obj)) {
-    matches = Array.from(obj.matchAll(xmlRegex));
-    for (index in matches) {keyNamesWithPasswordValues.push(matches[index][1]);}
-    return keyNamesWithPasswordValues;
-  }
-  // YAML
-  else if (yamlRegex.test(obj)) {
-    matches = Array.from(obj.matchAll(yamlRegex));
-    for (index in matches) {keyNamesWithPasswordValues.push(matches[index][1]);}
-    return keyNamesWithPasswordValues;
-   }
-// Unexpected Inputs
-  else {
-    errorFound=true;
-    errors.push("ERROR: Inputs unexpected!, the arg object must contains an array of strings");
-  }
-}
 
 /**
  * searchSubsting function searches the whole metadataset to find keys that include a given substring

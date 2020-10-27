@@ -11,7 +11,6 @@ var keyAndWantedValues = {"replicaCount" : [">", "1"]};
 var subsetToCheck = cds[0];
 var operatorArray = ["=", ">", "<", "IN", "NOT IN"];
 var pathSeparator = '/';
-var valArray = [];
 
 // Defines if error must include full path of key found
 var includePath = true;
@@ -46,6 +45,7 @@ return {description: description, result:!errorFound};
 // Check the value of a specific key based on its name
 function checkKeyValue(subset, keyName, operator, refValue, prefix, level, pathSeparator) {
   for (var item in subset) {
+    if (errors.length >= maxErrorDisplay) { break; }
     // check if the key has a value or points to an object
     if  (typeof(subset[item]) === "object") {
       // if value is an object call recursively the function to search this subset of the object
@@ -82,12 +82,12 @@ function checkValue (val, op, refVal) {
       if (val != refVal) { return false; }
       break;
     case "IN" :
-      valArray = refVal.split(',');
+      var valArray = refVal.split(',');
       // console.log(valArray);
       if (!(valArray.includes(val))) { return false; }
       break;
     case "NOT IN" :
-      valArray = refVal.split(',');
+      var valArray = refVal.split(',');
       if (valArray.includes(val)) { return false; }
       break;
   }

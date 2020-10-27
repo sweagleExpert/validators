@@ -28,25 +28,15 @@ var description = '';
 
 // HANDLERS
 // Inputs parser and checker
-  // Input values in object notation
-  // Checking the assigned metadasets and parse the node name from input values in object notation
-  // Else set the default values for running the validator
-  if (cds!=null){
-    for (var i=0; i<cds.length; i++){
-      rootNode = Object.keys(cds[i])[0];
-      superCDS[rootNode] = cds[i][rootNode];
-    }
-  } else {
-    errorFound=true;
-    errors.push("ERROR: No inputs provided! Please provide at least one arg in object notation.");
-  }
-	
-  if (arg!=""){
-    exceptionList=objFormat(arg.trim());
-  } else {
-    //Setting default values
-    exceptionList=[""];
-  }
+for (var i=0; i<cds.length; i++){
+  rootNode = Object.keys(cds[i])[0];
+  superCDS[rootNode] = cds[i][rootNode];
+}
+
+if (arg!=""){
+  exceptionList=objFormat(arg.trim());
+}
+
 // MAIN
 searchSubstringWithPath(superCDS, searchValue.toLowerCase(), [], 0, "/");
 
@@ -61,7 +51,7 @@ return {description: description, result:!errorFound};
  // FONCTIONS LIST
 // Parse the object notation: check upon against the RegEx format
 function objFormat(obj) {
-  var matches = ""; 
+  var matches = "";
   var index = "";
   //  {
   //    "exceptionList" : ["KEYNAME"]
@@ -72,7 +62,7 @@ function objFormat(obj) {
   // </exceptionList>
   var xmlRegex = /\<.*\>(.*?)<\/.*\>/gm;
   // exceptionList:
-  //	-KEYNAME 
+  //	-KEYNAME
   var yamlRegex = /.*\-(.*?)$/gm;
   // JSON
   if (jsonRegex.test(obj)) {
@@ -126,7 +116,7 @@ function searchSubstringWithPath (cds, searchValue, prefix, level, pathSeparator
             var pre=prefix[0];
             for (var i=1; i<level; i++) { pre = pre + pathSeparator + prefix[i]; }
             if (includePath) { errors.push("## key "+pre+pathSeparator+item+" contains an HTTP:// url value"); }
-            else { errors.push("## key "+item+" contains an HTTP:// url value"); };
+            else { errors.push("## key "+item+" contains an HTTP:// url value"); }
         }
       }
     }

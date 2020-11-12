@@ -9,66 +9,109 @@
 // Creator:   Stefanos for customer POC
 // Version:   1.1 - For Sweagle 2.23, handles new error format in JSON
 //
-var fromEnv = "qualif";
-var toEnv = "preprod";
+
+// defines max errors to display in result, 0 means no limit
+var maxErrorDisplay = 5;
+var errorFound = false;
+var errors = [];
+var description = "Validation passed successfully";
+// rules variables
+var environmentNodeName = "EnvironmentParameters";
+var fromEnv = "TST";
+var toEnv = "PRD";
 var sameValues = [
-    "autoConfirmIdentical",
-    "fromName"
+    "helpdeskEmail",
+    "adminusername"
 ];
 var diffValues = [
-    "senderUrl",
-    "password"
+    "password1",
+    "url2",
+  	"dbconnectionString3"
 ];
-
 var fromEnvFlattened = {};
 var toEnvFlattened = {};
-var errorFound = false;
-var errorMsg = "Validation passed successfully";
 
-function flattenObject (environment , flatObject) {
-    for (var item in environment) {
-        if (typeof (environment[item]) === "object") {
-            flattenObject(environment[item] , flatObject);
+
+// Got to environments subset
+var envSubset = getSubsetByNodeName(cds[0], environmentNodeName);
+//console.log(envSubset);
+if (envSubset != "ERROR: NOT FOUND") {
+    if ( envSubset.hasOwnProperty(fromEnv) ) {
+        flattenObject(envSubset[fromEnv] , fromEnvFlattened);
+    } else {
+        errorFound = true;
+        errors.push("Environment not found: "+fromEnv);
+    }
+    //console.log(fromEnvFlattened);
+    if ( envSubset.hasOwnProperty(toEnv) ) {
+        flattenObject(envSubset[toEnv] , toEnvFlattened);
+    } else {
+        errorFound = true;
+        errors.push("Environment not found: "+toEnv);
+    }
+    //console.log(toEnvFlattened);
+} else {
+	errorFound = true;
+    errors.push("Environment node not found!");
+}
+
+if (!errorFound) {
+    for (var i = 0 ; i < sameValues.length; i++ ) {
+        if (errors.length >= maxErrorDisplay) { break; }
+      	if ( fromEnvFlattened[sameValues[i]] !== toEnvFlattened[sameValues[i]] ) {
+            errorFound = true;
+            errors.push("ERROR: Values must be the same between environments "+fromEnv+" and "+toEnv+" for key: "+sameValues[i]);
+        }
+    }
+    for (var i = 0 ; i < diffValues.length; i++ ) {
+		if (errors.length >= maxErrorDisplay) { break; }
+      	// check if value exists in any of the flatten list
+      	if (fromEnvFlattened[diffValues[i]] != undefined || toEnvFlattened[diffValues[i]] != undefined) {
+          if ( fromEnvFlattened[diffValues[i]] === toEnvFlattened[diffValues[i]] ) {
+              errorFound = true;
+              errors.push("ERROR: Values must be different between environments "+fromEnv+" and "+toEnv+" for key: "+diffValues[i]);
+          }
+        }
+    }
+}
+
+// Display result
+if (errorFound) {
+  if (errors.length < maxErrorDisplay) { description = "ERRORS: " + errors.join(' '); }
+  else { description = "ERRORS: only first "+maxErrorDisplay+" errors are displayed:" + errors.join(' '); }
+}
+return {description: description, result:!errorFound};
+
+// Return a flat list of all keys included in subset
+function flattenObject (subset , flatObject) {
+    for (var item in subset) {
+        if (typeof (subset[item]) === "object") {
+            flattenObject(subset[item] , flatObject);
         }else {
             if (sameValues.includes(item) || diffValues.includes(item)) {
-                flatObject[item] = environment[item];
+                flatObject[item] = subset[item];
             }
         }
     }
 }
 
-if (metadataset && metadataset.hasOwnProperty('environments')) {
-    if ( metadataset.environments.hasOwnProperty(fromEnv) ) {
-        flattenObject(metadataset.environments[fromEnv] , fromEnvFlattened);
-    }else {
-        errorFound = true;
-        errorMsg = "ERROR: Environment not found: "+fromEnv;
+// Return a subset of configdataset based on its node name
+function getSubsetByNodeName(subset, name) {
+  var value = "ERROR: NOT FOUND";
+  for (var item in subset) {
+    // check if the key points to an object
+    if  (typeof(subset[item]) === "object") {
+      // check if the key equals to the search term
+      if (item === name ) {
+        return subset[item];
+      } else {
+	    // if value is an object call recursively the function to search this subset of the object
+    	value = getSubsetByNodeName(subset[item], name);
+        // if key was found, returns it
+        if (value != "ERROR: NOT FOUND") { return value; }
+      }
+      // if not, continue the loop
     }
-    if ( metadataset.environments.hasOwnProperty(toEnv) ) {
-        flattenObject(metadataset.environments[toEnv] , toEnvFlattened);
-    }else {
-        errorFound = true;
-        errorMsg = "ERROR: Environment not found: "+toEnv;
-    }
+  }
+  return value;
 }
-if (!errorFound) {
-    for (var i = 0 ; i < sameValues.length; i++ ) {
-        if ( fromEnvFlattened[sameValues[i]] !== toEnvFlattened[sameValues[i]] ) {
-            errorFound = true;
-            errorMsg = "ERROR: Values must be the same between environments "+fromEnv+" and "+toEnv+" for key: "+sameValues[i];
-            break;
-        }
-    }
-}
-
-if (!errorFound) {
-    for (var i = 0 ; i < diffValues.length; i++ ) {
-        if ( fromEnvFlattened[diffValues[i]] === toEnvFlattened[diffValues[i]] ) {
-            errorFound = true;
-            errorMsg = "ERROR: Values must be different between environments "+fromEnv+" and "+toEnv+" for key: "+diffValues[i];
-            break;
-        }
-    }
-}
-
-return {"result":!errorFound,"description":errorMsg};

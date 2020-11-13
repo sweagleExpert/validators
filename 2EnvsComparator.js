@@ -1,13 +1,15 @@
-// description: Compare 2 nodes to check that some values are identical and others are different
+// description: Compare 2 environments to check that some values are identical and others are different
 
-// envsComparator.js
+// 2EnvsComparator.js
 // Compare 2 nodes to check that some values are identical and others are different
 // Inputs are
+//    - environment node name
 //    - 2 nodes to compare
 //    - List of keys that must have same values
 //    - List of keys that must have different values
 // Creator:   Stefanos for customer POC
-// Version:   1.1 - For Sweagle 2.23, handles new error format in JSON
+// Maintainer: Dimitris for POC
+// Version:   1.2
 //
 
 // defines max errors to display in result, 0 means no limit
@@ -16,7 +18,7 @@ var errorFound = false;
 var errors = [];
 var description = "Validation passed successfully";
 // rules variables
-var environmentNodeName = "EnvironmentParameters";
+var environmentNodeName = "Environments";
 var fromEnv = "TST";
 var toEnv = "PRD";
 var sameValues = [
@@ -60,7 +62,7 @@ if (!errorFound) {
         if (errors.length >= maxErrorDisplay) { break; }
       	if ( fromEnvFlattened[sameValues[i]] !== toEnvFlattened[sameValues[i]] ) {
             errorFound = true;
-            errors.push("ERROR: Values must be the same between environments "+fromEnv+" and "+toEnv+" for key: "+sameValues[i]);
+            errors.push("Values must be the same between environments "+fromEnv+" and "+toEnv+" for key: "+sameValues[i]);
         }
     }
     for (var i = 0 ; i < diffValues.length; i++ ) {
@@ -69,7 +71,7 @@ if (!errorFound) {
       	if (fromEnvFlattened[diffValues[i]] != undefined || toEnvFlattened[diffValues[i]] != undefined) {
           if ( fromEnvFlattened[diffValues[i]] === toEnvFlattened[diffValues[i]] ) {
               errorFound = true;
-              errors.push("ERROR: Values must be different between environments "+fromEnv+" and "+toEnv+" for key: "+diffValues[i]);
+              errors.push("Values must be different between environments "+fromEnv+" and "+toEnv+" for key: "+diffValues[i]);
           }
         }
     }
@@ -77,8 +79,8 @@ if (!errorFound) {
 
 // Display result
 if (errorFound) {
-  if (errors.length < maxErrorDisplay) { description = "ERRORS: " + errors.join(' '); }
-  else { description = "ERRORS: only first "+maxErrorDisplay+" errors are displayed:" + errors.join(' '); }
+  if (errors.length < maxErrorDisplay) { description = "ERRORS: " + errors.join(', '); }
+  else { description = "ERRORS: only first "+maxErrorDisplay+" errors are displayed:" + errors.join(', '); }
 }
 return {description: description, result:!errorFound};
 

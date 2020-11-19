@@ -1,8 +1,7 @@
-// description: Check replicaCount if superior to 1, needed for containers in production that must be highly available
-// description: This is based on generic simple validator rule with a static keyAndWantedValues
+// description: Check that a list of keys respect a specific value rule based on operator
 
-// generic-simple-validator.js
-// Creator:   Dimitris for customer POC
+// keyValueWithOperator.js
+// Creator:   Dimitris
 // Version:   1.0 - First
 //
 var rootName = Object.keys(metadataset)[0];

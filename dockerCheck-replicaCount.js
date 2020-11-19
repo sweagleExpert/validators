@@ -9,7 +9,7 @@ var rootName = Object.keys(metadataset)[0];
 var root = metadataset[rootName];
 var keyAndWantedValues = {"replicaCount" : [">", "1"]};
 var subsetToCheck = cds[0];
-var operatorArray = ["=", ">", "<", "IN", "NOT IN"];
+var operatorArray = ["=", "!=", ">", "<", "IN", "NOT IN"];
 var pathSeparator = '/';
 
 // Defines if error must include full path of key found
@@ -80,6 +80,9 @@ function checkValue (val, op, refVal) {
       break;
     case "=" :
       if (val != refVal) { return false; }
+      break;
+    case "!=" :
+      if (val == refVal) { return false; }
       break;
     case "IN" :
       var valArray = refVal.split(',');

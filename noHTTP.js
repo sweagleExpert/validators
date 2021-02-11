@@ -33,7 +33,7 @@ for (var i=0; i<cds.length; i++){
   superCDS[rootNode] = cds[i][rootNode];
 }
 
-if (arg!=""){
+if (arg.trim()!=""){
   exceptionList=objFormat(arg.trim());
 }
 

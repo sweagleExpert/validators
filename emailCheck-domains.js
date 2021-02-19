@@ -60,7 +60,7 @@ function findValuesMatchingRegex(subset, regex, prefix, level, pathSeparator) {
           if (includePath) {
             var pre=prefix[0];
           	for (var i=1; i<level;i++) { pre = pre + pathSeparator + prefix[i]; }
-            errors.push("## key "+pre+pathSeparator+item+" is not encrypted");
+            errors.push("## key "+pre+pathSeparator+item+" has invalid domain ("+domain+")");
           } else {
             errors.push("## ERROR: key "+item+" has invalid domain ("+domain+")");
           }

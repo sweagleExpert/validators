@@ -20,7 +20,7 @@ var includePath = true;
 var pathSeparator = ",";
 
 // Rules variables
-var authorisedDomains = ["credit-suisse.com", "cs.com"];
+var authorisedDomains = ["mydomain1.com", "mydomain2.frm"];
 var emailExpression = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 var valueRegex = new RegExp(emailExpression);
 

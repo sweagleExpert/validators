@@ -13,8 +13,8 @@ var maxErrorDisplay = 0;
 var errorFound = false;
 var errors = [];
 var description = "Validation passed successfully";
-// Define key names to exclude from the research
-var exceptionList = ["become_user","toto"];
+// Define key or node names to exclude from the research
+var exceptionList = ["KEYNAME","NODENAME"];
 var pathSeparator = "/";
 
 // rules variables

@@ -1,4 +1,4 @@
-//checks if there are any CDI values with a white space at start or end
+// description: checks if there are any CDI values with a white space at start or end
 //the validation result shows the full path to the key(s) with such problem
 //validation logic is only applied on the primary assigned config data set
 var errorFound = false;
@@ -15,7 +15,7 @@ function findAll(mds,path) {
 				errors.push(tempItem);
               	errorFound = true;
 			}
-			
+
 		}
 	}
 }

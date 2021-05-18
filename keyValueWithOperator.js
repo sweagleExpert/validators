@@ -4,10 +4,10 @@
 // Creator:   Dimitris
 // Version:   1.0 - First
 //
-var rootName = Object.keys(metadataset)[0];
-var root = metadataset[rootName];
-var keyAndWantedValues = {"replicaCount" : [">", "1"]};
-var subsetToCheck = cds[0];
+// Store all the config datasets
+var superCDS={};
+// Root node string used to concatenate all CDS in superCDS
+var rootNode="";
 var operatorArray = ["=", "!=", ">", "<", "IN", "NOT IN"];
 var pathSeparator = '/';
 
@@ -18,15 +18,27 @@ var maxErrorDisplay = 5;
 var errorFound = false;
 var errors = [];
 var description = '';
+var refValues = [];
+
+for (var i=0; i<cds.length; i++){
+  rootNode = Object.keys(cds[i])[0];
+  superCDS[rootNode] = cds[i][rootNode];
+}
+
+var subsetToCheck = superCDS;
+var keyAndWantedValues = JSON.parse(arg);
 
 for (var key in keyAndWantedValues) {
   if (errors.length >= maxErrorDisplay) { break; }
   var operator = keyAndWantedValues[key][0];
-  var value = keyAndWantedValues[key][1];
+  //array to store refValues
+  for (var i=1; i<keyAndWantedValues[key].length; i++){
+    refValues.push(keyAndWantedValues[key][i]);
+  }
   //console.log("operator="+operator);
-  //console.log("value="+value);
+  //console.log("refValues="+refValues);
   if (operatorArray.includes(operator)) {
-    checkKeyValue(subsetToCheck, key, operator, value, [], 0, "/");
+    checkKeyValue(subsetToCheck, key, operator, refValues, [], 0, "/");
   } else {
     errorFound=true;
     errors.push("## operator ("+operator+") unknown");
@@ -72,24 +84,24 @@ function checkValue (val, op, refVal) {
   //console.log("refVal"+refVal);
   switch (op) {
     case ">" :
-      if (Number.parseFloat(val) <= Number.parseFloat(refVal)) { return false; }
+      if (Number.parseFloat(val) <= Number.parseFloat(refVal[0])) { return false; }
       break;
     case "<" :
-      if (Number.parseFloat(val) >= Number.parseFloat(refVal)) { return false; }
+      if (Number.parseFloat(val) >= Number.parseFloat(refVal[0])) { return false; }
       break;
     case "=" :
-      if (val != refVal) { return false; }
+      if (val != refVal[0]) { return false; }
       break;
     case "!=" :
-      if (val == refVal) { return false; }
+      if (val == refVal[0]) { return false; }
       break;
     case "IN" :
-      var valArray = refVal.split(',');
+      var valArray = refVal;
       // console.log(valArray);
       if (!(valArray.includes(val))) { return false; }
       break;
     case "NOT IN" :
-      var valArray = refVal.split(',');
+      var valArray = refVal;
       if (valArray.includes(val)) { return false; }
       break;
   }
